@@ -2,11 +2,23 @@
   "name": "azerite-uo-launcher",
   "version": "1.0.0",
   "description": "Azerite UO Launcher",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "dev": "electron . --trace-warnings",
+    "build": "electron-builder",
+    "stop": "pkill -f electron || true",
+    "server": "npx kill-port 3000 && nodemon server/server.js"
   },
   "author": "Azerite UO",
-  "license": "MIT"
-} 
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "electron-reloader": "^1.2.3",
+    "express": "^4.21.2",
+    "kill-port": "^2.0.1",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.1.9"
+  }
+}

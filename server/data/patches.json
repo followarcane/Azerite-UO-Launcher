@@ -1,0 +1,9 @@
+{
+    "patches": [
+        {
+            "version": "1.0.1",
+            "url": "http://localhost:3000/patches/1.0.1.zip",
+            "changes": ["Bug fixes", "New features"]
+        }
+    ]
+} 
