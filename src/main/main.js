@@ -1,20 +1,24 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const fs = require('fs')
 const config = require('./config.js')
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
-// Hot Reload (sadece development modunda çalışır)
+// Hot Reload (only in development mode)
 try {
     require('electron-reloader')(module, {
         debug: true,
-        watchRenderer: true
+        watchRenderer: true,
+        ignore: [
+            path.join(__dirname, 'config.js'),
+            path.join(__dirname, 'config.json')
+        ]
     });
 } catch (_) { console.log('Error loading electron-reloader'); }
 
 let mainWindow
-const CLIENT_PATH = config.clientPath
+let CLIENT_PATH = config.clientPath
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -27,10 +31,13 @@ function createWindow () {
   })
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
-  mainWindow.webContents.openDevTools()
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
 }
 
 app.whenReady().then(() => {
+    loadConfig()
     createWindow()
     if (process.env.NODE_ENV === 'development') {
         registerShutdown()
@@ -43,7 +50,7 @@ app.on('window-all-closed', () => {
   }
 })
 
-// Client path kontrolü
+// Check if client path exists
 function checkClientPath() {
     try {
         return fs.existsSync(CLIENT_PATH)
@@ -53,7 +60,7 @@ function checkClientPath() {
     }
 }
 
-// Version kontrol fonksiyonu
+// Check client version against server
 async function checkVersion() {
     try {
         const response = await fetch(`${config.updateServer}${config.versionCheckEndpoint}`)
@@ -114,6 +121,76 @@ ipcMain.on('start-client', async (event) => {
         event.reply('update-status', 'Error starting client: ' + error.message)
     }
 })
+
+ipcMain.on('select-client-path', async (event) => {
+    try {
+        const result = await dialog.showOpenDialog(mainWindow, {
+            properties: ['openFile'],
+            filters: [
+                { name: 'Executable', extensions: ['exe'] }
+            ]
+        });
+
+        if (!result.canceled && result.filePaths.length > 0) {
+            const selectedPath = result.filePaths[0];
+            
+            // Check path
+            if (selectedPath.toLowerCase().includes('client.exe') || 
+                (process.platform === 'darwin' && selectedPath.toLowerCase().includes('client'))) {
+                config.clientPath = selectedPath;
+                // Update CLIENT_PATH constant
+                CLIENT_PATH = selectedPath;
+                saveConfig();
+                
+                event.reply('selected-client-path', selectedPath);
+                event.reply('path-status', {
+                    status: 'success',
+                    message: 'Client path set successfully'
+                });
+            } else {
+                event.reply('path-status', {
+                    status: 'error',
+                    message: 'Please select a valid UO client.exe'
+                });
+            }
+        }
+    } catch (error) {
+        event.reply('path-status', {
+            status: 'error',
+            message: 'Error selecting client path: ' + error.message
+        });
+    }
+});
+
+// Save configuration to file
+function saveConfig() {
+    try {
+        const userDataPath = app.getPath('userData');
+        const configPath = path.join(userDataPath, 'config.json');
+        
+        fs.writeFileSync(
+            configPath,
+            JSON.stringify(config, null, 2)
+        );
+    } catch (error) {
+        console.error('Error saving config:', error);
+    }
+}
+
+// Ve başlangıçta config'i yüklemek için
+function loadConfig() {
+    try {
+        const userDataPath = app.getPath('userData');
+        const configPath = path.join(userDataPath, 'config.json');
+        
+        if (fs.existsSync(configPath)) {
+            const loadedConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            config = { ...config, ...loadedConfig };
+        }
+    } catch (error) {
+        console.error('Error loading config:', error);
+    }
+}
 
 function registerShutdown() {
     process.on('SIGINT', () => {

@@ -1,21 +1,14 @@
 // Mock API Server (mevcut server.js)
 const express = require('express')
-const app = express()
+const expressApp = express()
+const path = require('path')
 const port = process.env.PORT || 3000
 
-function startServer(retryPort = port) {
-    app.listen(retryPort, () => {
-        console.log(`Mock API server running at http://localhost:${retryPort}`)
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`Port ${retryPort} is busy, trying ${retryPort + 1}...`)
-            startServer(retryPort + 1)
-        }
-    })
-}
+// Express middleware
+expressApp.use(express.json())
 
-// Root path için basit bir response
-app.get('/', (req, res) => {
+// Root endpoint for testing
+expressApp.get('/', (req, res) => {
     res.json({
         status: 'Azerite UO Update Server is running',
         endpoints: {
@@ -24,7 +17,8 @@ app.get('/', (req, res) => {
     })
 })
 
-app.get('/api/version', (req, res) => {
+// Version check endpoint
+expressApp.get('/api/version', (req, res) => {
     res.json({
         version: '1.0.1',
         patches: [
@@ -37,12 +31,26 @@ app.get('/api/version', (req, res) => {
     })
 })
 
-// API hata yakalama
-app.use((req, res) => {
-    res.status(404).json({
-        error: 'Not Found',
-        message: `Path ${req.path} not found`
+// Error handling
+expressApp.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: err.message
     })
 })
+
+function startServer(retryPort = port) {
+    expressApp.listen(retryPort, () => {
+        console.log(`Mock API server running at http://localhost:${retryPort}`)
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${retryPort} is busy, trying ${retryPort + 1}...`)
+            startServer(retryPort + 1)
+        } else {
+            console.error('Server error:', err)
+        }
+    })
+}
 
 startServer() 
