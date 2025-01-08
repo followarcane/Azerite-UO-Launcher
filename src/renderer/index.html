@@ -6,30 +6,40 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Azerite UO Launcher</h1>
-            <div id="version">Client Version: <span id="client-version">Checking...</span></div>
-        </div>
-
-        <div class="main-content">
-            <div id="status-panel">
-                <div id="update-status">Checking for updates...</div>
-                <div id="download-progress" class="progress-bar">
-                    <div class="progress"></div>
-                </div>
+    <div class="app-container">
+        <div class="container">
+            <div class="header">
+                <h1>Azerite UO Launcher</h1>
+                <div id="version">Client Version: <span id="client-version">Checking...</span></div>
             </div>
 
-            <div id="client-path-panel">
-                <div class="path-container">
-                    <input type="text" id="client-path" readonly placeholder="Select UO Client path...">
-                    <button id="browse-client" class="btn">Browse</button>
+            <div class="main-content">
+                <div id="status-panel">
+                    <div id="update-status">Checking for updates...</div>
+                    <div id="download-progress" class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
                 </div>
-                <div id="path-status" class="status-text"></div>
-            </div>
 
-            <div class="actions">
-                <button id="start-client" class="btn primary">Start Game</button>
+                <div id="client-path-panel">
+                    <div class="path-container">
+                        <input type="text" id="client-path" readonly placeholder="Select UO Client path...">
+                        <button id="browse-client" class="btn">Browse</button>
+                    </div>
+                    <div id="path-status" class="status-text"></div>
+                </div>
+
+                <div class="actions">
+                    <button id="start-client" class="btn primary">Start Game</button>
+                </div>
+
+                <!-- Version History Panel -->
+                <div id="version-history-panel">
+                    <h2>Version History</h2>
+                    <div class="version-list">
+                        <!-- Versions will be added here dynamically -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>

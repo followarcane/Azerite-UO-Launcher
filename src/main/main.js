@@ -22,12 +22,20 @@ let CLIENT_PATH = config.clientPath
 
 function createWindow () {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
+    minWidth: 1280,  // Minimum boyut
+    minHeight: 720,  // Minimum boyut
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
-    }
+    },
+    // Pencereyi ortala
+    center: true,
+    // Pencere kenarlarını düzelt
+    useContentSize: true,
+    // Arka plan rengi
+    backgroundColor: '#1a1a1a'
   })
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
@@ -63,7 +71,7 @@ function checkClientPath() {
 // Check client version against server
 async function checkVersion() {
     try {
-        const response = await fetch(`${config.updateServer}${config.versionCheckEndpoint}`)
+        const response = await fetch(`http://127.0.0.1:3000${config.versionCheckEndpoint}`)
         const data = await response.json()
         
         return {
@@ -218,17 +226,17 @@ ipcMain.on('start-update', async (event) => {
         const versionInfo = await checkVersion();
         event.reply('download-progress', 0);
         
-        // Update simülasyonu...
+        // Update simulation
         for (let i = 0; i <= 100; i += 10) {
             await new Promise(resolve => setTimeout(resolve, 200));
             event.reply('download-progress', i);
         }
         
-        // Update başarılı
+        // Update successful
         config.currentVersion = versionInfo.serverVersion;
         saveConfig();
         
-        // Version'u tekrar kontrol et
+        // Check version again
         const newVersionInfo = await checkVersion();
         event.reply('client-version', newVersionInfo.currentVersion);
         
