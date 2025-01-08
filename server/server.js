@@ -34,6 +34,34 @@ expressApp.get('/api/version', (req, res) => {
     })
 })
 
+// Version history endpoint
+expressApp.get('/api/version-history', (req, res) => {
+    res.json({
+        versions: [
+            {
+                version: '1.0.1',
+                date: '2024-03-15',
+                changes: [
+                    'Added version history panel',
+                    'Implemented auto-update system',
+                    'Improved UI responsiveness'
+                ],
+                required: true
+            },
+            {
+                version: '1.0.0',
+                date: '2024-03-01',
+                changes: [
+                    'Initial release',
+                    'Basic launcher functionality',
+                    'Client path selection'
+                ],
+                required: false
+            }
+        ]
+    });
+});
+
 // Error handling
 expressApp.use((err, req, res, next) => {
     console.error(err.stack)
@@ -44,7 +72,7 @@ expressApp.use((err, req, res, next) => {
 })
 
 function startServer(retryPort = port) {
-    expressApp.listen(retryPort, () => {
+    expressApp.listen(retryPort, '127.0.0.1', () => {
         console.log(`Mock API server running at http://localhost:${retryPort}`)
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
