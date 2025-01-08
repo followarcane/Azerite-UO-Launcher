@@ -4,15 +4,20 @@ const { ipcRenderer } = require('electron')
 const clientVersionEl = document.getElementById('client-version');
 const updateStatusEl = document.getElementById('update-status');
 const progressBar = document.querySelector('.progress');
-const checkUpdateBtn = document.getElementById('check-update');
 const startClientBtn = document.getElementById('start-client');
 const clientPathInput = document.getElementById('client-path');
 const browseClientBtn = document.getElementById('browse-client');
 const pathStatusEl = document.getElementById('path-status');
 
 // Event Listeners
-checkUpdateBtn.addEventListener('click', checkForUpdates);
-startClientBtn.addEventListener('click', startClient);
+startClientBtn.addEventListener('click', async () => {
+    if (startClientBtn.textContent === 'Update Game') {
+        await handleUpdate();
+    } else {
+        startClient();
+    }
+});
+
 browseClientBtn.addEventListener('click', selectClientPath);
 
 // Functions
@@ -35,10 +40,19 @@ ipcRenderer.on('client-version', (event, version) => {
     clientVersionEl.textContent = version;
 });
 
-ipcRenderer.on('update-status', (event, status) => {
+ipcRenderer.on('update-status', (event, {status, needsUpdate}) => {
     updateStatusEl.textContent = status;
-    if (status.includes('Error')) {
+    
+    if (needsUpdate) {
+        // Update gerekiyorsa butonu güncelle
+        startClientBtn.textContent = 'Update Game';
+        startClientBtn.classList.add('update');
         startClientBtn.disabled = false;
+    } else {
+        // Update gerekmiyorsa normal butonu göster
+        startClientBtn.textContent = 'Start Game';
+        startClientBtn.classList.remove('update');
+        startClientBtn.disabled = !clientPathInput.value;
     }
 });
 
@@ -60,5 +74,36 @@ ipcRenderer.on('path-status', (event, {status, message}) => {
     startClientBtn.disabled = status !== 'success';
 });
 
+ipcRenderer.on('update-completed', () => {
+    startClientBtn.textContent = 'Start Game';
+    startClientBtn.classList.remove('update');
+    startClientBtn.disabled = false;
+    // Version'u güncelle
+    checkInitialVersion();
+});
+
 // Initial setup
 startClientBtn.disabled = !clientPathInput.value; 
+
+async function checkInitialVersion() {
+    startClientBtn.disabled = true;
+    updateStatusEl.textContent = 'Checking for updates...';
+    ipcRenderer.send('check-updates');
+}
+
+// Sayfa yüklendiğinde version kontrolü yap
+document.addEventListener('DOMContentLoaded', checkInitialVersion); 
+
+// Update işlemi
+async function handleUpdate() {
+    try {
+        startClientBtn.disabled = true;
+        updateStatusEl.textContent = 'Updating client...';
+        
+        // Update işlemini başlat
+        ipcRenderer.send('start-update');
+    } catch (error) {
+        updateStatusEl.textContent = 'Update failed: ' + error.message;
+        startClientBtn.disabled = false;
+    }
+} 

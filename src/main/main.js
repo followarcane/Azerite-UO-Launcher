@@ -68,8 +68,8 @@ async function checkVersion() {
         
         return {
             currentVersion: config.currentVersion,
-            serverVersion: data.version,
-            needsUpdate: data.version !== config.currentVersion,
+            serverVersion: data.serverVersion,
+            needsUpdate: config.currentVersion !== data.serverVersion,
             patches: data.patches
         }
     } catch (error) {
@@ -86,14 +86,23 @@ ipcMain.on('check-updates', async (event) => {
         event.reply('client-version', versionInfo.currentVersion)
         
         if (versionInfo.needsUpdate) {
-            event.reply('update-status', `Update available: ${versionInfo.serverVersion}`)
+            event.reply('update-status', {
+                status: `Update available: ${versionInfo.serverVersion}`,
+                needsUpdate: true
+            });
         } else {
-            event.reply('update-status', 'Client is up to date')
+            event.reply('update-status', {
+                status: 'Client is up to date',
+                needsUpdate: false
+            });
         }
     } catch (error) {
-        event.reply('update-status', 'Error checking version: ' + error.message)
+        event.reply('update-status', {
+            status: 'Error checking version: ' + error.message,
+            needsUpdate: false
+        });
     }
-})
+});
 
 ipcMain.on('start-client', async (event) => {
     try {
@@ -202,4 +211,38 @@ function registerShutdown() {
         console.log('Shutting down...')
         app.quit()
     })
-} 
+}
+
+ipcMain.on('start-update', async (event) => {
+    try {
+        const versionInfo = await checkVersion();
+        event.reply('download-progress', 0);
+        
+        // Update simülasyonu...
+        for (let i = 0; i <= 100; i += 10) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            event.reply('download-progress', i);
+        }
+        
+        // Update başarılı
+        config.currentVersion = versionInfo.serverVersion;
+        saveConfig();
+        
+        // Version'u tekrar kontrol et
+        const newVersionInfo = await checkVersion();
+        event.reply('client-version', newVersionInfo.currentVersion);
+        
+        event.reply('update-status', {
+            status: 'Update completed successfully!',
+            needsUpdate: false
+        });
+        
+        event.reply('update-completed');
+        
+    } catch (error) {
+        event.reply('update-status', {
+            status: 'Update failed: ' + error.message,
+            needsUpdate: true
+        });
+    }
+}); 
