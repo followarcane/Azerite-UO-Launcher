@@ -20,12 +20,15 @@ expressApp.get('/', (req, res) => {
 // Version check endpoint
 expressApp.get('/api/version', (req, res) => {
     res.json({
-        version: '1.0.1',
+        currentVersion: '1.0.0',
+        serverVersion: '1.0.1',
+        needsUpdate: true,
         patches: [
             {
                 version: '1.0.1',
                 url: 'http://localhost:3000/patches/1.0.1.zip',
-                changes: ['Bug fixes', 'New features']
+                changes: ['Bug fixes', 'New features'],
+                required: true
             }
         ]
     })
