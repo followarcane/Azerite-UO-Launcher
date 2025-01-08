@@ -5,7 +5,7 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --trace-warnings",
+    "dev": "npx concurrently \"nodemon server/server.js\" \"electron . --trace-warnings\"",
     "build": "electron-builder",
     "stop": "pkill -f electron || true",
     "server": "npx kill-port 3000 && nodemon server/server.js"
@@ -19,6 +19,7 @@
     "express": "^4.21.2",
     "kill-port": "^2.0.1",
     "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "concurrently": "^8.2.2"
   }
 }
