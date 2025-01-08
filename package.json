@@ -5,10 +5,11 @@
   "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "npx concurrently \"nodemon server/server.js\" \"electron . --trace-warnings\"",
+    "dev": "npm run cleanup && npx concurrently \"nodemon server/server.js\" \"electron . --trace-warnings\"",
     "build": "electron-builder",
     "stop": "pkill -f electron || true",
-    "server": "npx kill-port 3000 && nodemon server/server.js"
+    "server": "npx kill-port 3000 && nodemon server/server.js",
+    "cleanup": "pkill -f 'Electron' || true && pkill -f 'nodemon' || true && pkill -f 'concurrently' || true && npx kill-port 3000 || true"
   },
   "author": "Azerite UO",
   "license": "MIT",
