@@ -1,0 +1,12 @@
+{
+  "name": "azerite-uo-launcher",
+  "version": "1.0.0",
+  "description": "Azerite UO Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Azerite UO",
+  "license": "MIT"
+} 
