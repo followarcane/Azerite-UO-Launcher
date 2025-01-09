@@ -1,0 +1,10 @@
+{
+    "latestVersion": "1.0.1",
+    "patches": [
+        {
+            "version": "1.0.1",
+            "url": "http://localhost:3000/patches/1.0.1/patch.zip",
+            "info": "http://localhost:3000/patches/1.0.1/info.json"
+        }
+    ]
+} 

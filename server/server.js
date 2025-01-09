@@ -7,6 +7,14 @@ const port = process.env.PORT || 3000
 // Express middleware
 expressApp.use(express.json())
 
+// Static dosyalar için middleware
+expressApp.use('/patches', express.static(path.join(__dirname, 'patches')))
+
+// Test endpoint'i ekleyelim
+expressApp.get('/test-patch', (req, res) => {
+    res.download(path.join(__dirname, 'patches/1.0.1/patch.zip'))
+})
+
 // Root endpoint for testing
 expressApp.get('/', (req, res) => {
     res.json({
@@ -85,3 +93,20 @@ function startServer(retryPort = port) {
 }
 
 startServer() 
+
+expressApp.get('/patches/:version/patch.zip', (req, res) => {
+    const version = req.params.version;
+    const patchPath = path.join(__dirname, 'patches', version, 'patch.zip');
+    
+    res.download(patchPath, `patch-${version}.zip`, (err) => {
+        if (err) {
+            console.error('Error sending patch file:', err);
+            res.status(500).send('Error sending patch file');
+        }
+    });
+}); 
+
+expressApp.get('/patches/1.0.1.zip', (req, res) => {
+    const patchPath = path.join(__dirname, 'patches', '1.0.1', 'patch.zip');
+    res.download(patchPath);
+}); 
