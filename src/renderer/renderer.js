@@ -1,13 +1,12 @@
 const { ipcRenderer } = require('electron')
 
 // UI Elements
-const clientVersionEl = document.getElementById('client-version');
-const updateStatusEl = document.getElementById('update-status');
-const progressBar = document.querySelector('.progress');
 const startClientBtn = document.getElementById('start-client');
 const clientPathInput = document.getElementById('client-path');
 const browseClientBtn = document.getElementById('browse-client');
 const pathStatusEl = document.getElementById('path-status');
+const updateStatusEl = document.getElementById('update-status');
+const progressBar = document.querySelector('.progress');
 
 // Event Listeners
 startClientBtn.addEventListener('click', async () => {
@@ -18,14 +17,11 @@ startClientBtn.addEventListener('click', async () => {
     }
 });
 
-browseClientBtn.addEventListener('click', selectClientPath);
-
-// Functions
-async function checkForUpdates() {
-    updateStatusEl.textContent = 'Checking for updates...';
-    ipcRenderer.send('check-updates');
+if (browseClientBtn) {
+    browseClientBtn.addEventListener('click', selectClientPath);
 }
 
+// Functions
 async function startClient() {
     startClientBtn.disabled = true;
     ipcRenderer.send('start-client');
@@ -35,34 +31,50 @@ async function selectClientPath() {
     ipcRenderer.send('select-client-path');
 }
 
+async function handleUpdate() {
+    try {
+        startClientBtn.disabled = true;
+        updateStatusEl.textContent = 'Updating client...';
+        ipcRenderer.send('start-update');
+    } catch (error) {
+        updateStatusEl.textContent = 'Update failed: ' + error.message;
+        startClientBtn.disabled = false;
+    }
+}
+
+// Version check
+async function checkVersion() {
+    updateStatusEl.textContent = 'Checking for updates...';
+    ipcRenderer.send('check-updates');
+}
+
 // IPC Listeners
 ipcRenderer.on('client-version', (event, version) => {
-    clientVersionEl.textContent = version;
-    loadVersionHistory();
+    document.getElementById('client-version').textContent = version;
 });
 
 ipcRenderer.on('update-status', (event, {status, needsUpdate}) => {
     updateStatusEl.textContent = status;
     
     if (needsUpdate) {
-        // If update is needed, update the button
         startClientBtn.textContent = 'Update Game';
-        startClientBtn.classList.add('update');
-        startClientBtn.disabled = false;
+        startClientBtn.classList.add('update-needed');
     } else {
-        // If no update needed, show normal button
-        startClientBtn.textContent = 'Start Game';
-        startClientBtn.classList.remove('update');
-        startClientBtn.disabled = !clientPathInput.value;
+        startClientBtn.textContent = 'Enter Sosaria';
+        startClientBtn.classList.remove('update-needed');
     }
+    startClientBtn.disabled = false;
+});
+
+ipcRenderer.on('update-completed', () => {
+    startClientBtn.textContent = 'Enter Sosaria';
+    startClientBtn.classList.remove('update-needed');
+    startClientBtn.disabled = false;
+    checkVersion();
 });
 
 ipcRenderer.on('download-progress', (event, progress) => {
     progressBar.style.width = `${progress}%`;
-});
-
-ipcRenderer.on('client-closed', () => {
-    startClientBtn.disabled = false;
 });
 
 ipcRenderer.on('selected-client-path', (event, path) => {
@@ -72,33 +84,43 @@ ipcRenderer.on('selected-client-path', (event, path) => {
 ipcRenderer.on('path-status', (event, {status, message}) => {
     pathStatusEl.textContent = message;
     pathStatusEl.className = `status-text ${status}`;
-    startClientBtn.disabled = status !== 'success';
 });
 
-ipcRenderer.on('update-completed', () => {
-    startClientBtn.textContent = 'Start Game';
-    startClientBtn.classList.remove('update');
-    startClientBtn.disabled = false;
-    checkInitialVersion();
+// Sayfa geçişleri için
+document.querySelectorAll('.sidebar nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Aktif link stilini güncelle
+        document.querySelector('.sidebar nav a.active').classList.remove('active');
+        link.classList.add('active');
+        
+        // Sayfaları güncelle
+        const targetPage = link.dataset.page;
+        document.querySelectorAll('.page').forEach(page => {
+            if (page.id === targetPage) {
+                page.classList.add('active');
+                page.style.display = 'block';
+            } else {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            }
+        });
+    });
 });
 
-// Version history functions
+// Version history yükleme
 async function loadVersionHistory() {
     try {
         const response = await fetch('http://127.0.0.1:3000/api/version-history');
         const data = await response.json();
         
-        console.log('Version history data:', data);
-        
         const versionList = document.querySelector('.version-list');
         versionList.innerHTML = '';
         
         data.versions.forEach(version => {
-            const isCurrentVersion = version.version === clientVersionEl.textContent;
-            console.log('Comparing versions:', version.version, clientVersionEl.textContent);
-            
             const versionItem = document.createElement('div');
-            versionItem.className = `version-item ${isCurrentVersion ? 'current-version' : ''}`;
+            versionItem.className = 'version-item';
             
             versionItem.innerHTML = `
                 <div class="version-header">
@@ -117,31 +139,8 @@ async function loadVersionHistory() {
     }
 }
 
-// Initial setup
-startClientBtn.disabled = !clientPathInput.value;
-
-async function checkInitialVersion() {
-    startClientBtn.disabled = true;
-    updateStatusEl.textContent = 'Checking for updates...';
-    ipcRenderer.send('check-updates');
-}
-
-// Sayfa yüklendiğinde version kontrolü ve history yükleme
+// Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
-    checkInitialVersion();
     loadVersionHistory();
+    checkVersion();
 });
-
-// Update işlemi
-async function handleUpdate() {
-    try {
-        startClientBtn.disabled = true;
-        updateStatusEl.textContent = 'Updating client...';
-        
-        // Start update process
-        ipcRenderer.send('start-update');
-    } catch (error) {
-        updateStatusEl.textContent = 'Update failed: ' + error.message;
-        startClientBtn.disabled = false;
-    }
-} 
