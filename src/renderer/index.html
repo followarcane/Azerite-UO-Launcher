@@ -4,42 +4,115 @@
     <meta charset="UTF-8">
     <title>Azerite UO Launcher</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
-        <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <nav>
+                <a href="#" class="active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" data-page="support">
+                    <i class="fas fa-headset"></i>
+                    <span>Support</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Header -->
             <div class="header">
-                <h1>Azerite UO Launcher</h1>
-                <div id="version">Client Version: <span id="client-version">Checking...</span></div>
+                <h1>Azerite UO</h1>
+                <div class="server-status">
+                    <div class="status-item">
+                        <i class="fas fa-users"></i>
+                        <span class="count">247</span>
+                        <span class="label">Online Players</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-clock"></i>
+                        <span class="count">12:00</span>
+                        <span class="label">Server Time</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="main-content">
-                <div id="status-panel">
-                    <div id="update-status">Checking for updates...</div>
-                    <div id="download-progress" class="progress-bar">
-                        <div class="progress"></div>
+            <!-- Content Pages -->
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard">
+                    <div class="dashboard-grid">
+                        <!-- Version History Panel -->
+                        <div class="panel version-panel">
+                            <h2>Chronicles of Updates</h2>
+                            <div class="version-list">
+                                <!-- Version history will be added here dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Client Status Panel -->
+                        <div class="panel client-panel">
+                            <h2>Client Status</h2>
+                            <div id="status-panel">
+                                <div id="update-status">Checking for updates...</div>
+                                <div id="download-progress" class="progress-bar">
+                                    <div class="progress"></div>
+                                </div>
+                            </div>
+                            <div class="client-actions">
+                                <button id="start-client" class="btn primary">Start Game</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div id="client-path-panel">
-                    <div class="path-container">
-                        <input type="text" id="client-path" readonly placeholder="Select UO Client path...">
-                        <button id="browse-client" class="btn">Browse</button>
+                <!-- Settings Page -->
+                <div class="page" id="settings">
+                    <div class="panel settings-panel">
+                        <h2>Game Settings</h2>
+                        <div class="settings-form">
+                            <div class="setting-item">
+                                <label>Client Path</label>
+                                <div class="path-container">
+                                    <input type="text" id="client-path" readonly placeholder="Select Ultima Online Client Path...">
+                                    <button id="browse-client" class="btn">Browse</button>
+                                </div>
+                                <div id="path-status" class="status-text"></div>
+                            </div>
+                            <div class="setting-item">
+                                <label>Installation Directory</label>
+                                <div class="path-container">
+                                    <input type="text" id="install-path" readonly placeholder="Select Installation Directory...">
+                                    <button id="browse-install" class="btn">Browse</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="path-status" class="status-text"></div>
                 </div>
 
-                <div class="actions">
-                    <button id="start-client" class="btn primary">Start Game</button>
+                <!-- Other Pages -->
+                <div class="page" id="support">
+                    <!-- Support content -->
                 </div>
+            </div>
 
-                <!-- Version History Panel -->
-                <div id="version-history-panel">
-                    <h2>Version History</h2>
-                    <div class="version-list">
-                        <!-- Versions will be added here dynamically -->
-                    </div>
+            <!-- Footer -->
+            <div class="footer">
+                <div class="social-links">
+                    <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
                 </div>
+                <div class="version">Client Version: <span id="client-version">Checking...</span></div>
             </div>
         </div>
     </div>

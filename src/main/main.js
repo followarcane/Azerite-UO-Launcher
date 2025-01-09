@@ -3,10 +3,17 @@ const path = require('path')
 const { spawn } = require('child_process')
 const fs = require('fs')
 const fsPromises = require('fs/promises')
-const config = require('./config.js')
+const { defaults } = require('./config.js')
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const JSZip = require('jszip');
 const AdmZip = require('adm-zip');
+
+// Başlangıç config değerlerini oluştur
+let config = { ...defaults };
+let mainWindow
+let CLIENT_PATH = config.clientPath
+let updateCheckInterval;
+const CHECK_INTERVAL = 3600000; // 1 saat (milisaniye cinsinden)
 
 // Hot Reload (only in development mode)
 try {
@@ -19,9 +26,6 @@ try {
         ]
     });
 } catch (_) { console.log('Error loading electron-reloader'); }
-
-let mainWindow
-let CLIENT_PATH = config.clientPath
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -46,18 +50,84 @@ function createWindow () {
   }
 }
 
+// Otomatik kontrol fonksiyonu
+async function checkForUpdatesAutomatically() {
+    try {
+        const versionInfo = await checkVersion();
+        if (versionInfo.needsUpdate) {
+            // Güncellemeyi başlat
+            const patch = versionInfo.patches[0];
+            
+            const patchDir = path.join(app.getPath('userData'), 'patches');
+            await fsPromises.mkdir(patchDir, { recursive: true });
+            
+            const patchPath = path.join(patchDir, `patch-${patch.version}.zip`);
+            
+            // Renderer'a bilgi ver
+            mainWindow.webContents.send('update-status', {
+                status: 'Updating...',
+                needsUpdate: true
+            });
+            
+            await downloadPatch(patch.url, patchPath, (progress) => {
+                mainWindow.webContents.send('download-progress', progress);
+            });
+            
+            await installPatch(patchPath, path.dirname(CLIENT_PATH));
+            
+            config.currentVersion = versionInfo.serverVersion;
+            saveConfig();
+            
+            mainWindow.webContents.send('update-status', {
+                status: 'Update completed!',
+                needsUpdate: false
+            });
+            
+            mainWindow.webContents.send('update-completed');
+        }
+    } catch (error) {
+        console.error('Update check error:', error);
+        mainWindow.webContents.send('update-status', {
+            status: 'Update check failed: ' + error.message,
+            needsUpdate: false
+        });
+    }
+}
+
+// Interval başlatma fonksiyonu
+function startUpdateChecks() {
+    // Varolan interval'ı temizle
+    if (updateCheckInterval) {
+        clearInterval(updateCheckInterval);
+    }
+    
+    // İlk kontrolü hemen yap
+    checkForUpdatesAutomatically();
+    
+    // Sonra her saat başı kontrol et
+    updateCheckInterval = setInterval(checkForUpdatesAutomatically, CHECK_INTERVAL);
+}
+
+// Uygulama başladığında kontrolleri başlat
 app.whenReady().then(() => {
     loadConfig()
     createWindow()
+    startUpdateChecks()
+    
     if (process.env.NODE_ENV === 'development') {
         registerShutdown()
     }
 })
 
+// Uygulama kapanırken interval'ı temizle
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    if (updateCheckInterval) {
+        clearInterval(updateCheckInterval);
+    }
+    
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 // Check if client path exists
@@ -194,10 +264,9 @@ function saveConfig() {
         const userDataPath = app.getPath('userData');
         const configPath = path.join(userDataPath, 'config.json');
         
-        fs.writeFileSync(
-            configPath,
-            JSON.stringify(config, null, 2)
-        );
+        // Tüm config değerlerini kaydet
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        console.log('Saved config:', config);
     } catch (error) {
         console.error('Error saving config:', error);
     }
@@ -210,7 +279,13 @@ function loadConfig() {
         
         if (fs.existsSync(configPath)) {
             const loadedConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-            config = { ...config, ...loadedConfig };
+            // Varsayılan değerler ile kaydedilmiş değerleri birleştir
+            config = { ...defaults, ...loadedConfig };
+            console.log('Loaded config:', config);
+        } else {
+            // Config dosyası yoksa varsayılan değerleri kaydet
+            fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+            console.log('Created default config');
         }
     } catch (error) {
         console.error('Error loading config:', error);
@@ -305,37 +380,3 @@ async function installPatch(patchPath, targetDir) {
         throw error;
     }
 }
-
-ipcMain.on('start-update', async (event) => {
-    try {
-        const versionInfo = await checkVersion();
-        const patch = versionInfo.patches[0];
-        
-        const patchDir = path.join(app.getPath('userData'), 'patches');
-        await fsPromises.mkdir(patchDir, { recursive: true });
-        
-        const patchPath = path.join(patchDir, `patch-${patch.version}.zip`);
-        
-        await downloadPatch(patch.url, patchPath, (progress) => {
-            event.reply('download-progress', progress);
-        });
-        
-        await installPatch(patchPath, path.dirname(CLIENT_PATH));
-        
-        config.currentVersion = versionInfo.serverVersion;
-        saveConfig();
-        
-        event.reply('update-status', {
-            status: 'Update completed successfully!',
-            needsUpdate: false
-        });
-        
-        event.reply('update-completed');
-        
-    } catch (error) {
-        event.reply('update-status', {
-            status: 'Update failed: ' + error.message,
-            needsUpdate: true
-        });
-    }
-}); 
