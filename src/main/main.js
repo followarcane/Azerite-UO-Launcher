@@ -2,8 +2,11 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const fs = require('fs')
+const fsPromises = require('fs/promises')
 const config = require('./config.js')
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const JSZip = require('jszip');
+const AdmZip = require('adm-zip');
 
 // Hot Reload (only in development mode)
 try {
@@ -24,17 +27,16 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 720,
-    minWidth: 1280,  // Minimum boyut
-    minHeight: 720,  // Minimum boyut
+    minWidth: 1280,  // Minimum size
+    minHeight: 720,  // Minimum size
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     },
-    // Pencereyi ortala
+    // Center the window
     center: true,
-    // Pencere kenarlarını düzelt
+    // Fix window edges
     useContentSize: true,
-    // Arka plan rengi
     backgroundColor: '#1a1a1a'
   })
 
@@ -74,12 +76,19 @@ async function checkVersion() {
         const response = await fetch(`http://127.0.0.1:3000${config.versionCheckEndpoint}`)
         const data = await response.json()
         
+        console.log('Received data from server:', data);
+        
         return {
             currentVersion: config.currentVersion,
             serverVersion: data.serverVersion,
             needsUpdate: config.currentVersion !== data.serverVersion,
-            patches: data.patches
+            patches: data.patches.map(patch => ({
+                ...patch,
+                url: patch.url.replace('localhost', '127.0.0.1')  // URL'yi güncelle
+            }))
         }
+        
+        console.log('Final patch URLs:', data.patches.map(patch => patch.url.replace('localhost', '127.0.0.1')));
     } catch (error) {
         console.error('Version check failed:', error)
         throw error
@@ -194,7 +203,6 @@ function saveConfig() {
     }
 }
 
-// Ve başlangıçta config'i yüklemek için
 function loadConfig() {
     try {
         const userDataPath = app.getPath('userData');
@@ -221,24 +229,101 @@ function registerShutdown() {
     })
 }
 
+// New functions for patch operations
+async function downloadPatch(url, targetPath, onProgress) {
+    console.log('Downloading patch from:', url);
+    console.log('Saving to:', targetPath);
+    
+    const response = await fetch(url);
+    const total = parseInt(response.headers.get('content-length'), 10);
+    console.log('Total file size:', total, 'bytes');
+    
+    let downloaded = 0;
+    const fileStream = fs.createWriteStream(targetPath);
+    
+    return new Promise((resolve, reject) => {
+        response.body.pipe(fileStream);
+        response.body.on('data', (chunk) => {
+            downloaded += chunk.length;
+            onProgress(Math.round((downloaded / total) * 100));
+        });
+        
+        fileStream.on('finish', async () => {
+            console.log('Download completed, file size:', downloaded, 'bytes');
+            fileStream.close();
+            
+            try {
+                const stats = await fs.promises.stat(targetPath);
+                console.log('Downloaded file size:', stats.size, 'bytes');
+                
+                const fileContent = await fs.promises.readFile(targetPath);
+                console.log('Downloaded file content length:', fileContent.length, 'bytes');
+                console.log('First 100 bytes of downloaded file:', fileContent.slice(0, 100));
+                
+                const zip = new JSZip();
+                await zip.loadAsync(fileContent);
+                console.log('Zip file is valid, entries:', Object.keys(zip.files).length);
+                resolve();
+            } catch (error) {
+                console.error('Invalid zip file:', error);
+                reject(error);
+            }
+        });
+        
+        fileStream.on('error', (err) => {
+            console.error('Download error:', err);
+            reject(err);
+        });
+    });
+}
+
+async function installPatch(patchPath, targetDir) {
+    try {
+        console.log('Installing patch from:', patchPath);
+        console.log('Target directory:', targetDir);
+        
+        const stats = await fs.promises.stat(patchPath);
+        console.log('Patch file size:', stats.size, 'bytes');
+        
+        const fileContent = await fs.promises.readFile(patchPath);
+        console.log('File content length:', fileContent.length, 'bytes');
+        console.log('First 100 bytes:', fileContent.slice(0, 100));
+        
+        const zip = new AdmZip(patchPath);
+        const backupPath = path.join(app.getPath('userData'), 'backups', Date.now().toString());
+        
+        await fs.promises.mkdir(backupPath, { recursive: true });
+        
+        const entries = zip.getEntries();
+        console.log('Zip entries:', entries.map(e => e.entryName));
+        
+        zip.extractAllTo(targetDir, true);
+        
+        return true;
+    } catch (error) {
+        console.error('Install patch error:', error);
+        throw error;
+    }
+}
+
 ipcMain.on('start-update', async (event) => {
     try {
         const versionInfo = await checkVersion();
-        event.reply('download-progress', 0);
+        const patch = versionInfo.patches[0];
         
-        // Update simulation
-        for (let i = 0; i <= 100; i += 10) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-            event.reply('download-progress', i);
-        }
+        const patchDir = path.join(app.getPath('userData'), 'patches');
+        await fsPromises.mkdir(patchDir, { recursive: true });
         
-        // Update successful
+        const patchPath = path.join(patchDir, `patch-${patch.version}.zip`);
+        
+        await downloadPatch(patch.url, patchPath, (progress) => {
+            event.reply('download-progress', progress);
+        });
+        
+        await installPatch(patchPath, path.dirname(CLIENT_PATH));
+        
         config.currentVersion = versionInfo.serverVersion;
         saveConfig();
-        
-        // Check version again
-        const newVersionInfo = await checkVersion();
-        event.reply('client-version', newVersionInfo.currentVersion);
         
         event.reply('update-status', {
             status: 'Update completed successfully!',

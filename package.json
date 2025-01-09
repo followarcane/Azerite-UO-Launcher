@@ -14,13 +14,17 @@
   "author": "Azerite UO",
   "license": "MIT",
   "devDependencies": {
+    "adm-zip": "^0.5.16",
+    "concurrently": "^8.2.2",
     "electron": "^28.3.3",
     "electron-builder": "^24.13.3",
     "electron-reloader": "^1.2.3",
     "express": "^4.21.2",
     "kill-port": "^2.0.1",
     "node-fetch": "^3.3.2",
-    "nodemon": "^3.1.9",
-    "concurrently": "^8.2.2"
+    "nodemon": "^3.1.9"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
   }
 }
