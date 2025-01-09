@@ -1,0 +1,16 @@
+{
+    "version": "1.0.0",
+    "size": 1024,
+    "files": [
+        {
+            "path": "client.exe",
+            "size": 512,
+            "required": true
+        },
+        {
+            "path": "data.uop",
+            "size": 512,
+            "required": true
+        }
+    ]
+} 

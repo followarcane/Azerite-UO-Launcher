@@ -1,17 +1,14 @@
 {
     "version": "1.0.1",
-    "releaseDate": "2024-03-15",
-    "size": "1.2MB",
-    "md5": "abc123",
     "changes": [
-        "Added version history panel",
-        "Implemented auto-update system",
-        "Improved UI responsiveness"
+        "Bug fixes",
+        "New features"
     ],
     "files": [
         {
             "path": "client.exe",
-            "md5": "def456"
+            "size": 512,
+            "required": true
         }
     ]
 } 
