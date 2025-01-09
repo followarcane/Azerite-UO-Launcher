@@ -21,10 +21,10 @@
     "electron-reloader": "^1.2.3",
     "express": "^4.21.2",
     "kill-port": "^2.0.1",
-    "node-fetch": "^3.3.2",
     "nodemon": "^3.1.9"
   },
   "dependencies": {
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "node-fetch": "^2.7.0"
   }
 }

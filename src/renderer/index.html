@@ -4,104 +4,220 @@
     <meta charset="UTF-8">
     <title>Azerite UO Launcher</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar -->
         <div class="sidebar">
-            <nav>
-                <a href="#" class="active" data-page="dashboard">
+            <nav class="nav-section">
+                <a href="#" class="nav-item active" data-page="dashboard">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" data-page="settings">
+                <a href="#" class="nav-item" data-page="settings">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
-                </a>
-                <a href="#" data-page="support">
-                    <i class="fas fa-headset"></i>
-                    <span>Support</span>
                 </a>
             </nav>
         </div>
 
         <!-- Main Content -->
-        <div class="main">
-            <!-- Header -->
-            <div class="header">
-                <h1>Azerite UO</h1>
-                <div class="server-status">
-                    <div class="status-item">
-                        <i class="fas fa-users"></i>
-                        <span class="count">247</span>
-                        <span class="label">Online Players</span>
+        <div class="main-content">
+            <!-- Game Header -->
+            <div class="game-header">
+                <div class="title-section">
+                    <h1 class="game-title">Azerite UO</h1>
+                    <p class="game-subtitle">Free Shard</p>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="status-display">
+                        <div class="status-item">
+                            <span class="status-label">Online Players</span>
+                            <span class="status-value">247</span>
+                        </div>
                     </div>
-                    <div class="status-item">
-                        <i class="fas fa-clock"></i>
-                        <span class="count">12:00</span>
-                        <span class="label">Server Time</span>
+                    <div class="server-status">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Server Online</span>
                     </div>
                 </div>
             </div>
 
             <!-- Content Pages -->
-            <div class="content">
+            <div class="pages">
                 <!-- Dashboard Page -->
                 <div class="page active" id="dashboard">
-                    <div class="dashboard-grid">
-                        <!-- Version History Panel -->
-                        <div class="panel version-panel">
-                            <h2>Chronicles of Updates</h2>
-                            <div class="version-list">
-                                <!-- Version history will be added here dynamically -->
+                    <!-- Updates Container -->
+                    <div class="updates-container">
+                        <!-- Shard Updates Panel -->
+                        <div class="update-panel">
+                            <div class="panel-header">
+                                <h2 class="panel-title">Shard Updates</h2>
+                                <span class="version-badge">Build 2345</span>
+                            </div>
+                            <div class="update-list">
+                                <div class="update-item">
+                                    <div class="update-title">New Event System</div>
+                                    <div class="update-description">
+                                        Enhanced event management and scheduling.
+                                    </div>
+                                </div>
+                                <!-- Yeni Shard Updates -->
+                                <div class="update-item">
+                                    <div class="update-title">PvP Balance Changes</div>
+                                    <div class="update-description">
+                                        Adjusted warrior and mage skills for better balance.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">New Dungeon: Crystal Caverns</div>
+                                    <div class="update-description">
+                                        Explore the new challenging dungeon with unique rewards.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Housing System Update</div>
+                                    <div class="update-description">
+                                        Added new house designs and decoration options.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Economy Adjustments</div>
+                                    <div class="update-description">
+                                        Rebalanced vendor prices and rare item drop rates.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Pet System Expansion</div>
+                                    <div class="update-description">
+                                        Added new tameable creatures and pet abilities.
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Client Status Panel -->
-                        <div class="panel client-panel">
-                            <h2>Client Status</h2>
-                            <div id="status-panel">
-                                <div id="update-status">Checking for updates...</div>
-                                <div id="download-progress" class="progress-bar">
-                                    <div class="progress"></div>
+                        <!-- Client Updates Panel -->
+                        <div class="update-panel">
+                            <div class="panel-header">
+                                <h2 class="panel-title">Client Updates</h2>
+                                <span class="version-badge">v1.0.1</span>
+                            </div>
+                            <div class="update-list">
+                                <div class="update-item">
+                                    <div class="update-title">Performance Improvements</div>
+                                    <div class="update-description">
+                                        Enhanced client performance and reduced memory usage.
+                                    </div>
+                                </div>
+                                <!-- Yeni Client Updates -->
+                                <div class="update-item">
+                                    <div class="update-title">UI Enhancements</div>
+                                    <div class="update-description">
+                                        Improved interface responsiveness and visual feedback.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Graphics Update</div>
+                                    <div class="update-description">
+                                        Added support for higher resolutions and new shader effects.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Sound System Upgrade</div>
+                                    <div class="update-description">
+                                        Implemented new audio engine with 3D positional audio.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Network Optimization</div>
+                                    <div class="update-description">
+                                        Reduced latency and improved connection stability.
+                                    </div>
+                                </div>
+                                <div class="update-item">
+                                    <div class="update-title">Bug Fixes</div>
+                                    <div class="update-description">
+                                        Fixed various client crashes and visual glitches.
+                                    </div>
                                 </div>
                             </div>
-                            <div class="client-actions">
-                                <button id="start-client" class="btn primary">Start Game</button>
+                        </div>
+                    </div>
+
+                    <!-- Game Control Panel -->
+                    <div class="game-control">
+                        <!-- Installation Info (Oyun yüklü değilken) -->
+                        <div id="install-info" style="display: none;">
+                            <div class="status-text">Game is not installed</div>
+                            <button class="button button-primary" id="install-game">
+                                <i class="fas fa-download"></i>
+                                Install Game
+                            </button>
+                        </div>
+
+                        <!-- Game Info (Oyun yüklüyken) -->
+                        <div id="game-info" style="display: none;">
+                            <div class="installation-status">
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 0%"></div>
+                                </div>
+                                <div class="status-text">Client is up to date</div>
                             </div>
+                            <button class="button button-primary" id="start-game">
+                                <i class="fas fa-play"></i>
+                                Start Game
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Settings Page -->
                 <div class="page" id="settings">
-                    <div class="panel settings-panel">
-                        <h2>Game Settings</h2>
-                        <div class="settings-form">
+                    <div class="settings-container">
+                        <div class="settings-group">
+                            <h3>Game Settings</h3>
                             <div class="setting-item">
-                                <label>Client Path</label>
-                                <div class="path-container">
-                                    <input type="text" id="client-path" readonly placeholder="Select Ultima Online Client Path...">
-                                    <button id="browse-client" class="btn">Browse</button>
-                                </div>
-                                <div id="path-status" class="status-text"></div>
+                                <label for="install-path">Installation Path</label>
+                                <input type="text" id="install-path" readonly>
+                                <button class="button button-secondary" id="change-path">Change</button>
                             </div>
                             <div class="setting-item">
-                                <label>Installation Directory</label>
-                                <div class="path-container">
-                                    <input type="text" id="install-path" readonly placeholder="Select Installation Directory...">
-                                    <button id="browse-install" class="btn">Browse</button>
-                                </div>
+                                <label for="repair-game">Game Files</label>
+                                <button class="button button-secondary" id="repair-game">Repair Game</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>Client Settings</h3>
+                            <div class="setting-item">
+                                <label for="resolution">Resolution</label>
+                                <select id="resolution">
+                                    <option value="1920x1080">1920x1080</option>
+                                    <option value="1600x900">1600x900</option>
+                                    <option value="1366x768">1366x768</option>
+                                </select>
+                            </div>
+                            <div class="setting-item checkbox">
+                                <input type="checkbox" id="fullscreen">
+                                <label for="fullscreen">Fullscreen</label>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h3>Appearance</h3>
+                            <div class="setting-item">
+                                <label for="theme">Theme</label>
+                                <select id="theme">
+                                    <option value="default">Dark Fantasy</option>
+                                    <option value="ember">Ember</option>
+                                    <option value="azure">Azure</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Other Pages -->
-                <div class="page" id="support">
-                    <!-- Support content -->
                 </div>
             </div>
 
@@ -109,13 +225,14 @@
             <div class="footer">
                 <div class="social-links">
                     <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
-                    <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
                 </div>
                 <div class="version">Client Version: <span id="client-version">Checking...</span></div>
             </div>
         </div>
     </div>
+
     <script src="renderer.js"></script>
+    <script src="installer-ui.js"></script>
 </body>
 </html> 

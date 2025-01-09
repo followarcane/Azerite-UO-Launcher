@@ -1,10 +1,15 @@
+const defaults = {
+    clientPath: '',
+    installPath: '',
+    currentVersion: '',
+    isInstalled: false,
+    settings: {
+        resolution: '1920x1080',
+        fullscreen: false,
+        theme: 'default'
+    }
+};
+
 module.exports = {
-  defaults: {
-    clientPath: "/Users/batu/Desktop/UOTest/client.exe",
-    currentVersion: "1.0.0",
-    updateServer: "http://localhost:3000",
-    versionCheckEndpoint: "/api/version",
-    patchDirectory: "./patches",
-    downloadDirectory: "/path/to/download/directory"
-  }
+    defaults
 };
