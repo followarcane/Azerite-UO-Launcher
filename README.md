@@ -2,6 +2,8 @@
 
 A modern, customizable Ultima Online shard launcher built with Electron. Provides a professional launcher solution for your UO shard with auto-update functionality and a sleek user interface.
 
+![Azerite UO Launcher](https://i.imgur.com/U3xGH9z.png)
+
 ## Features
 
 - 🎮 Automatic game download and installation
@@ -48,10 +50,10 @@ The executable will be created in `out/make/squirrel.windows/x64`.
 The server component requires the following structure:
 
 server/
-├── config.js # Server configuration
-├── server.js # Main server file
-└── full-client/ # Client files
-└── info.json # Client information
+├── config.js
+├── server.js
+└── full-client
+└── info.json
 
 
 ### Server Configuration Example
@@ -64,7 +66,6 @@ patchNotes: "path/to/patchnotes",
 fullClientUrl: "your-client-download-url",
 serverStatus: {
 endpoint: "your-server-status-endpoint"
-}
 }
 ```
 
