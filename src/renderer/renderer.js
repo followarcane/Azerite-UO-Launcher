@@ -11,31 +11,27 @@ function formatBytes(bytes) {
 
 // Sayfa geçişleri için
 function initializePageNavigation() {
-    const navItems = document.querySelectorAll('.nav-item[data-page]');
+    const titleSection = document.querySelector('.title-section');
+    const settingsButton = document.querySelector('.settings-button');
     const pages = document.querySelectorAll('.page');
 
-    // İlk yüklemede sadece dashboard'u göster
+    // İlk yüklemede dashboard'u göster
     pages.forEach(page => {
-        page.style.display = 'none';  // Önce hepsini gizle
+        page.style.display = 'none';
     });
-    document.getElementById('dashboard').style.display = 'block';  // Dashboard'u göster
+    document.getElementById('dashboard').style.display = 'block';
 
-    // Dashboard nav item'ını aktif yap
-    document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
+    // Title'a tıklayınca dashboard'a git
+    titleSection.addEventListener('click', () => {
+        pages.forEach(page => {
+            page.style.display = page.id === 'dashboard' ? 'block' : 'none';
+        });
+    });
 
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetPage = item.getAttribute('data-page');
-            
-            // Active class'ları güncelle
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            
-            // Sayfaları göster/gizle
-            pages.forEach(page => {
-                page.style.display = page.id === targetPage ? 'block' : 'none';
-            });
+    // Settings butonuna tıklayınca settings'e git
+    settingsButton.addEventListener('click', () => {
+        pages.forEach(page => {
+            page.style.display = page.id === 'settings' ? 'block' : 'none';
         });
     });
 }

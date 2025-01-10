@@ -9,47 +9,27 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <nav class="nav-section">
-                <a href="#" class="nav-item active" data-page="dashboard">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" data-page="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </nav>
-        </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <!-- Game Header -->
             <div class="game-header">
-                <div class="title-section">
+                <div class="title-section" data-page="dashboard">
                     <h1 class="game-title">Azerite UO</h1>
-                    <p class="game-subtitle">Free Shard</p>
+                    <p class="game-subtitle">Mixed Custom Expansion</p>
                 </div>
                 
                 <div class="header-actions">
-                    <div class="status-display">
-                        <div class="status-item">
-                            <span class="status-label">Online Players</span>
-                            <span class="status-value">247</span>
-                        </div>
-                    </div>
-                    <div class="server-status">
-                        <span class="status-indicator"></span>
-                        <span class="status-text">Server Online</span>
-                    </div>
+                    <button class="settings-button" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Content Pages -->
             <div class="pages">
                 <!-- Dashboard Page -->
-                <div class="page active" id="dashboard">
+                <div class="page" id="dashboard">
                     <!-- Updates Container -->
                     <div class="updates-container">
                         <!-- Shard Updates Panel -->
@@ -61,40 +41,15 @@
                             <div class="update-list">
                                 <div class="update-item">
                                     <div class="update-title">New Event System</div>
-                                    <div class="update-description">
-                                        Enhanced event management and scheduling.
-                                    </div>
+                                    <div class="update-description">Enhanced event management and scheduling system.</div>
                                 </div>
-                                <!-- Yeni Shard Updates -->
                                 <div class="update-item">
                                     <div class="update-title">PvP Balance Changes</div>
-                                    <div class="update-description">
-                                        Adjusted warrior and mage skills for better balance.
-                                    </div>
+                                    <div class="update-description">Adjusted warrior and mage skills for better balance.</div>
                                 </div>
                                 <div class="update-item">
                                     <div class="update-title">New Dungeon: Crystal Caverns</div>
-                                    <div class="update-description">
-                                        Explore the new challenging dungeon with unique rewards.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Housing System Update</div>
-                                    <div class="update-description">
-                                        Added new house designs and decoration options.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Economy Adjustments</div>
-                                    <div class="update-description">
-                                        Rebalanced vendor prices and rare item drop rates.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Pet System Expansion</div>
-                                    <div class="update-description">
-                                        Added new tameable creatures and pet abilities.
-                                    </div>
+                                    <div class="update-description">Explore the new challenging dungeon with unique rewards.</div>
                                 </div>
                             </div>
                         </div>
@@ -108,40 +63,15 @@
                             <div class="update-list">
                                 <div class="update-item">
                                     <div class="update-title">Performance Improvements</div>
-                                    <div class="update-description">
-                                        Enhanced client performance and reduced memory usage.
-                                    </div>
+                                    <div class="update-description">Enhanced client performance and reduced memory usage.</div>
                                 </div>
-                                <!-- Yeni Client Updates -->
                                 <div class="update-item">
                                     <div class="update-title">UI Enhancements</div>
-                                    <div class="update-description">
-                                        Improved interface responsiveness and visual feedback.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Graphics Update</div>
-                                    <div class="update-description">
-                                        Added support for higher resolutions and new shader effects.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Sound System Upgrade</div>
-                                    <div class="update-description">
-                                        Implemented new audio engine with 3D positional audio.
-                                    </div>
-                                </div>
-                                <div class="update-item">
-                                    <div class="update-title">Network Optimization</div>
-                                    <div class="update-description">
-                                        Reduced latency and improved connection stability.
-                                    </div>
+                                    <div class="update-description">Improved interface responsiveness and visual feedback.</div>
                                 </div>
                                 <div class="update-item">
                                     <div class="update-title">Bug Fixes</div>
-                                    <div class="update-description">
-                                        Fixed various client crashes and visual glitches.
-                                    </div>
+                                    <div class="update-description">Fixed various client crashes and visual glitches.</div>
                                 </div>
                             </div>
                         </div>
@@ -149,7 +79,7 @@
 
                     <!-- Game Control Panel -->
                     <div class="game-control">
-                        <!-- Installation Info (Oyun yüklü değilken) -->
+                        <!-- Installation Info -->
                         <div id="install-info" style="display: none;">
                             <div class="status-text">Game is not installed</div>
                             <button class="button button-primary" id="install-game">
@@ -158,7 +88,7 @@
                             </button>
                         </div>
 
-                        <!-- Game Info (Oyun yüklüyken) -->
+                        <!-- Game Info -->
                         <div id="game-info" style="display: none;">
                             <div class="installation-status">
                                 <div class="progress-bar">
@@ -223,6 +153,16 @@
 
             <!-- Footer -->
             <div class="footer">
+                <div class="status-display">
+                    <div class="server-status">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Server Online | </span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Online Players</span>
+                        <span class="status-value">247</span>
+                    </div>
+                </div>
                 <div class="social-links">
                     <a href="#" target="_blank"><i class="fab fa-discord"></i></a>
                     <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
